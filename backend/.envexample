@@ -1,0 +1,38 @@
+# ========== SERVER CONFIG ==========
+PORT=5000
+
+# ========== GOOGLE OAUTH ==========
+CLIENT_ID=
+CLIENT_SECRET=
+REDIRECT_URI=http://localhost:8000/login/oauth2/code/google
+
+# ========== OUTLOOK OAUTH ==========
+OUTLOOK_CLIENT_ID=
+OUTLOOK_CLIENT_SECRET=
+OUTLOOK_REDIRECT_URI=http://localhost:8000/login/oauth2/code/outlook
+# Outlook fetches only recent messages. Allowed values: 1 or 2.
+OUTLOOK_FETCH_RECENT_DAYS=2
+
+# ========== DATABASE ==========
+DB_USERNAME=
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=
+
+# ========== JWT & TOKEN ==========
+JWT_SECRET=
+TOKEN_ENCRYPTION_KEY=
+JWT_EXPIRES_IN=1h
+
+# ========== GMAIL CONFIG ==========
+GMAIL_PUBSUB_TOPIC=
+GCP_PROJECT_ID=
+# Gmail fetches only recent messages. Allowed values: 1 or 2.
+GMAIL_FETCH_RECENT_DAYS=2
+
+# ========== EMAIL PRIORITY LLM (OpenRouter) ==========
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=xiaomi/mimo-v2-pro
+OPENROUTER_FALLBACK_ON_ERROR=false
+PRIORITY_USE_SNIPPET_ONLY=true
