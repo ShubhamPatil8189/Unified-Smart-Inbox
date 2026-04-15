@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
+import SignUpPage from "../pages/SignUpPage";
 import OAuthCallback from "../pages/OAuthCallback";
 import Dashboard from "../pages/Dashboard";
 import GmailPage from "../pages/GmailPage";
@@ -23,7 +23,7 @@ function AppRoutes() {
 
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<SignUpPage />} />
         <Route path="/auth/google/callback" element={<OAuthCallback />} />
 
         {/* Dashboard */}
