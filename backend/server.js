@@ -7,17 +7,7 @@ const { DataTypes } = require("sequelize");
 
 const app = express();
 
-const FRONTEND_URL = String(process.env.FRONTEND_URL || "http://localhost:5173").trim();
-
-function buildFrontendUrl(path, params = {}) {
-  const url = new URL(path, FRONTEND_URL);
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, String(value));
-    }
-  });
-  return url.toString();
-}
+const { PORT, CORS_ORIGINS, buildFrontendUrl, requestWantsJson } = require("./utils/envConfig");
 
 async function ensureDatabaseCompatibility() {
   const queryInterface = sequelize.getQueryInterface();
@@ -105,25 +95,6 @@ async function ensureDatabaseCompatibility() {
   }
 }
 
-const defaultFrontendOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:4173",
-  "https://unifiedbox.vercel.app",
-];
-
-const configuredOrigins = [
-  process.env.FRONTEND_URL,
-  ...(process.env.FRONTEND_URLS || "").split(","),
-  ...(process.env.CORS_ORIGINS || "").split(","),
-]
-  .map((origin) => String(origin || "").trim().replace(/\/$/, "")) // Remove trailing slashes
-  .filter(Boolean);
-
-const allowedOrigins = new Set([...defaultFrontendOrigins.map(o => o.replace(/\/$/, "")), ...configuredOrigins]);
-
-console.log("[CORS] Initialized with Allowed Origins:", Array.from(allowedOrigins));
-
 // CORS for browser clients using cookie-based auth from the frontend.
 app.use(
   cors({
@@ -135,13 +106,14 @@ app.use(
 
       const normalizedOrigin = String(origin).trim().replace(/\/$/, "");
       
-      if (allowedOrigins.has(normalizedOrigin)) {
+      if (CORS_ORIGINS.some(o => o.replace(/\/$/, "") === normalizedOrigin)) {
         return callback(null, true);
       }
 
-      console.warn(`[CORS] Request rejected. Origin: "${origin}" (normalized: "${normalizedOrigin}") is not in allowed list:`, Array.from(allowedOrigins));
+      console.warn(`[CORS] Request rejected. Origin: "${origin}" is not in allowed list.`);
       return callback(new Error("Not allowed by CORS"));
     },
+    credentials: true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -219,19 +191,7 @@ app.use((err, req, res, next) => {
   return next(err);
 });
 
-let redirectUriPort = 0;
-
-try {
-  const redirectUri = String(process.env.REDIRECT_URI || "").trim();
-  if (redirectUri) {
-    const parsedRedirectUri = new URL(redirectUri);
-    redirectUriPort = Number(parsedRedirectUri.port) || 0;
-  }
-} catch {
-  redirectUriPort = 0;
-}
-
-const PORT = redirectUriPort || Number(process.env.PORT) || 8000;
+// PORT is now handled by envConfig
 
 async function bootstrap() {
   await ensureDatabaseCompatibility();

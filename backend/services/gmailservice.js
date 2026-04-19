@@ -7,25 +7,9 @@ const notificationService = require("./notificationservice");
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
+const { REDIRECT_URI, buildFrontendUrl, requestWantsJson } = require("../utils/envConfig");
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-
-function buildFrontendUrl(path, params = {}) {
-  const url = new URL(path, FRONTEND_URL);
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, String(value));
-    }
-  });
-  return url.toString();
-}
-
-function requestWantsJson(req) {
-  const acceptHeader = String(req.headers?.accept || "").toLowerCase();
-  return acceptHeader.includes("application/json") && !acceptHeader.includes("text/html");
-}
 
 function getLinkedUserIdFromCookie(req) {
   const token = req.cookies?.token || null;

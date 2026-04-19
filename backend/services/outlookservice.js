@@ -6,14 +6,9 @@ const priorityService = require("./priorityservice");
 const sseService = require("./sseservice");
 const notificationService = require("./notificationservice");
 
-function normalizeEnv(value) {
-  return String(value || "").trim().replace(/^['\"]|['\"]$/g, "");
-}
-
-const OUTLOOK_CLIENT_ID = normalizeEnv(process.env.OUTLOOK_CLIENT_ID);
-const OUTLOOK_CLIENT_SECRET = normalizeEnv(process.env.OUTLOOK_CLIENT_SECRET);
-const OUTLOOK_REDIRECT_URI = normalizeEnv(process.env.OUTLOOK_REDIRECT_URI);
-const FRONTEND_URL = normalizeEnv(process.env.FRONTEND_URL) || "http://localhost:5173";
+const { OUTLOOK_REDIRECT_URI, FRONTEND_URL, buildFrontendUrl, requestWantsJson } = require("../utils/envConfig");
+const OUTLOOK_CLIENT_ID = String(process.env.OUTLOOK_CLIENT_ID || "").trim();
+const OUTLOOK_CLIENT_SECRET = String(process.env.OUTLOOK_CLIENT_SECRET || "").trim();
 
 const AUTH_BASE = "https://login.microsoftonline.com/common/oauth2/v2.0";
 const TOKEN_URL = `${AUTH_BASE}/token`;
@@ -37,20 +32,7 @@ function buildOutlookRecentFilter(days) {
   return `isRead eq false and receivedDateTime ge ${since}`;
 }
 
-function buildFrontendUrl(path, params = {}) {
-  const url = new URL(path, FRONTEND_URL);
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      url.searchParams.set(key, String(value));
-    }
-  });
-  return url.toString();
-}
-
-function requestWantsJson(req) {
-  const acceptHeader = String(req.headers?.accept || "").toLowerCase();
-  return acceptHeader.includes("application/json") && !acceptHeader.includes("text/html");
-}
+// Helper functions moved to envConfig
 
 function getLinkedUserIdFromCookie(req) {
   const token = req.cookies?.token || null;
